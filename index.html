@@ -1131,20 +1131,6 @@ function navigateTo(viewId, scrollSectionId = null) {
     }
 }
 
-    if (error) {
-        console.error('Chyba při přihlášení:', error);
-        showToast('Nesprávný e-mail nebo heslo.');
-        return;
-    }
-
-    if (data.user) {
-        showToast('Úspěšně přihlášeno.');
-        navigateTo('account');
-    }
-});
-   
-  
-
 
         function handleHashRoute() {
             const hash = window.location.hash.replace('#', '') || 'home';
