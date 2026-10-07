@@ -1034,7 +1034,35 @@
         // TODO: Replace with Supabase Client SDK instance when deploying
         // const supabase = createClient('https://YOUR-PROJECT.supabase.co', 'YOUR-ANON-KEY')
         
-        async function fetchProductsFromSupabase() {
+       async function fetchProductsFromSupabase() {
+    const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('active', true)
+        .order('created_at', { ascending: true });
+
+    if (error) {
+        console.error("Chyba při načítání produktů:", error);
+        showToast("Produkty se nepodařilo načíst.");
+        return;
+    }
+
+    if (data) {
+        products = data.map(product => ({
+            id: product.id,
+            title: product.name,
+            category: "Produkty",
+            price: Number(product.price),
+            availability: product.stock > 0 ? "Skladem" : "Vyprodáno",
+            image: product.image_url,
+            description: product.description
+        }));
+
+        renderFeaturedProducts();
+        renderShop();
+        renderAdminProducts();
+    }
+}
             /*
             // TODO: Uncomment when Supabase is connected
             const { data, error } = await supabase.from('products').select('*');
