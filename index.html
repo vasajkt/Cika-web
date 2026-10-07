@@ -1144,11 +1144,21 @@ function navigateTo(viewId, scrollSectionId = null) {
             const targetView = document.getElementById(`view-${viewId}`) || document.getElementById('view-home');
             targetView.classList.add('active');
         }
+function toggleMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
 
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        }
+    if (!menu) {
+        console.error('Mobilní menu nebylo nalezeno.');
+        return;
+    }
+
+    if (menu.classList.contains('hidden')) {
+        menu.classList.remove('hidden');
+    } else {
+        menu.classList.add('hidden');
+    }
+}
+       
 
         /* ==========================================================================
            4. SHOP & PRODUCT RENDERERS
