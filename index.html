@@ -1073,7 +1073,7 @@
         /* ==========================================================================
            3. APPLICATION INITIALIZATION & ROUTING
            ========================================================================== */
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             loadCartFromStorage();
             fetchProductsFromSupabase();
             renderFeaturedProducts();
