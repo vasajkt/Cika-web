@@ -1075,6 +1075,7 @@
            ========================================================================== */
         window.addEventListener('DOMContentLoaded', () => {
             loadCartFromStorage();
+            fetchProductsFromSupabase();
             renderFeaturedProducts();
             renderShop();
             renderAdminProducts();
