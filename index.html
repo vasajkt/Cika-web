@@ -1331,39 +1331,90 @@
         /* ==========================================================================
            7. CHECKOUT & SUBMISSION (Supabase DB Insertion Prepared)
            ========================================================================== */
-        function handleCheckoutSubmit(e) {
-            e.preventDefault();
-            
-            const orderPayload = {
-                customer: {
-                    firstname: document.getElementById('checkout-firstname').value,
-                    lastname: document.getElementById('checkout-lastname').value,
-                    email: document.getElementById('checkout-email').value,
-                    phone: document.getElementById('checkout-phone').value,
-                    street: document.getElementById('checkout-street').value,
-                    city: document.getElementById('checkout-city').value,
-                    zip: document.getElementById('checkout-zip').value
-                },
-                items: cart,
-                shipping: document.querySelector('input[name="shipping"]:checked')?.value,
-                payment: document.querySelector('input[name="payment"]:checked')?.value,
-                note: document.getElementById('checkout-note').value,
-                createdAt: new Date().toISOString()
-            };
+        async function handleCheckoutSubmit(e) {
+    e.preventDefault();
 
-            console.log("Order Payload Prepared for Supabase:", orderPayload);
+    if (!cart || cart.length === 0) {
+        showToast("Košík je prázdný.");
+        return;
+    }
 
-            /*
-            // TODO: Replace with Supabase insert when API client is connected:
-            // const { data, error } = await supabase.from('orders').insert([orderPayload]);
-            */
+    const firstname = document.getElementById('checkout-firstname').value.trim();
+    const lastname = document.getElementById('checkout-lastname').value.trim();
+    const email = document.getElementById('checkout-email').value.trim();
+    const phone = document.getElementById('checkout-phone').value.trim();
+    const street = document.getElementById('checkout-street').value.trim();
+    const city = document.getElementById('checkout-city').value.trim();
+    const zip = document.getElementById('checkout-zip').value.trim();
+    const note = document.getElementById('checkout-note')?.value.trim() || '';
 
-            cart = [];
-            saveCartToStorage();
-            showToast("Objednávka byla úspěšně odeslána! Děkujeme.");
-            navigateTo('account');
-        }
+    const shipping = document.querySelector('input[name="shipping"]:checked')?.value || '';
+    const payment = document.querySelector('input[name="payment"]:checked')?.value || '';
 
+    const shippingPrices = {
+        "Zásilkovna": 79
+    };
+
+    const shippingPrice = shippingPrices[shipping] || 0;
+
+    const productsTotal = cart.reduce((sum, item) => {
+        return sum + (Number(item.price) * Number(item.qty));
+    }, 0);
+
+    const total = productsTotal + shippingPrice;
+
+    const fullName = `${firstname} ${lastname}`.trim();
+    const address = `${street}`;
+
+    // 1. Vytvoření objednávky
+    const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert([{
+            customer_name: fullName,
+            customer_email: email,
+            customer_phone: phone,
+            shipping_address: address,
+            city: city,
+            postal_code: zip,
+            note: `${note}${shipping ? ` Doprava: ${shipping}.` : ''}${payment ? ` Platba: ${payment}.` : ''}`,
+            total: total,
+            status: 'Nová'
+        }])
+        .select()
+        .single();
+
+    if (orderError) {
+        console.error("Chyba při vytváření objednávky:", orderError);
+        showToast("Objednávku se nepodařilo odeslat. Zkuste to prosím znovu.");
+        return;
+    }
+
+    // 2. Přidání položek objednávky
+    const orderItems = cart.map(item => ({
+        order_id: order.id,
+        product_id: item.id,
+        product_name: item.title,
+        quantity: Number(item.qty),
+        unit_price: Number(item.price)
+    }));
+
+    const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+    if (itemsError) {
+        console.error("Chyba při ukládání položek objednávky:", itemsError);
+        showToast("Objednávka byla vytvořena, ale nepodařilo se uložit její položky.");
+        return;
+    }
+
+    // 3. Vyčištění košíku
+    cart = [];
+    saveCartToStorage();
+
+    showToast("Objednávka byla úspěšně odeslána! Děkujeme.");
+    navigateTo('account');
+}
         /* ==========================================================================
            8. AUTHENTICATION & ADMIN HANDLERS
            ========================================================================== */
