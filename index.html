@@ -1074,11 +1074,11 @@
            3. APPLICATION INITIALIZATION & ROUTING
            ========================================================================== */
         window.addEventListener('DOMContentLoaded', async () => {
-            loadCartFromStorage();
-            fetchProductsFromSupabase();
-            renderFeaturedProducts();
-            renderShop();
-            renderAdminProducts();
+           loadCartFromStorage();
+await fetchProductsFromSupabase();
+renderFeaturedProducts();
+renderShop();
+renderAdminProducts();
             
             // Handle Hash Navigation
             window.addEventListener('hashchange', handleHashRoute);
