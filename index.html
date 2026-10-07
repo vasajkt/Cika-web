@@ -1093,9 +1093,27 @@ renderAdminProducts();
             handleHashRoute();
         });
 
-        function navigateTo(viewId, scrollSectionId = null) {
-            window.location.hash = viewId;
-            showView(viewId);
+      function navigateTo(viewId, scrollSectionId = null) {
+
+    // Administrace je dostupná pouze po přihlášení administrátora.
+    if (viewId === 'admin') {
+        showToast('Administrace je dostupná pouze administrátorovi.');
+        navigateTo('login');
+        return;
+    }
+
+    window.location.hash = viewId;
+    showView(viewId);
+
+    if (scrollSectionId) {
+        setTimeout(() => {
+            const el = document.getElementById(scrollSectionId);
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+    } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
             if (scrollSectionId) {
                 setTimeout(() => {
                     const el = document.getElementById(scrollSectionId);
