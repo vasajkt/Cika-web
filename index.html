@@ -1123,9 +1123,6 @@ document.getElementById('account-login-form')?.addEventListener('submit', async 
         navigateTo('account');
     }
 });
-    window.location.hash = viewId;
-    showView(viewId);
-
     if (scrollSectionId) {
         setTimeout(() => {
             const el = document.getElementById(scrollSectionId);
