@@ -1101,7 +1101,28 @@ renderAdminProducts();
         navigateTo('login');
         return;
     }
+document.getElementById('account-login-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
+    const email = document.getElementById('account-email').value.trim();
+    const password = document.getElementById('account-password').value;
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password
+    });
+
+    if (error) {
+        console.error('Chyba při přihlášení:', error);
+        showToast('Nesprávný e-mail nebo heslo.');
+        return;
+    }
+
+    if (data.user) {
+        showToast('Úspěšně přihlášeno.');
+        navigateTo('account');
+    }
+});
     window.location.hash = viewId;
     showView(viewId);
 
