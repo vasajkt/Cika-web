@@ -12,6 +12,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+    const supabaseUrl = 'https://hilmrlpmdazzaezuctvs.supabase.co';
+    const supabaseKey = 'sb_publishable__szmPow0JL9tW1ZkUrS8gQ_utGMTdQl';
+
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+</script>
         tailwind.config = {
             theme: {
                 extend: {
