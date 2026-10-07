@@ -1517,12 +1517,52 @@ function toggleMobileMenu() {
             navigateTo('account');
         }
 
-        function handleRegisterSubmit(e) {
-            e.preventDefault();
-            // TODO: supabase.auth.signUp({ email, password })
-            showToast("Účet byl vytvořen");
-            navigateTo('account');
+        <script>
+async function handleRegisterSubmit(e) {
+    e.preventDefault();
+
+    const email = document.getElementById('register-email').value.trim();
+    const password = document.getElementById('register-password').value;
+    const passwordConfirm = document.getElementById('register-password-confirm')?.value;
+
+    if (!email || !password) {
+        showToast('Vyplňte e-mail a heslo.');
+        return;
+    }
+
+    if (password.length < 6) {
+        showToast('Heslo musí mít alespoň 6 znaků.');
+        return;
+    }
+
+    if (passwordConfirm !== undefined && password !== passwordConfirm) {
+        showToast('Hesla se neshodují.');
+        return;
+    }
+
+    const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password
+    });
+
+    if (error) {
+        console.error('Chyba při registraci:', error);
+
+        if (error.message.toLowerCase().includes('already registered')) {
+            showToast('Tento e-mail už je registrovaný.');
+        } else {
+            showToast('Registrace se nepodařila.');
         }
+
+        return;
+    }
+
+    if (data.user) {
+        showToast('Účet byl vytvořen. Zkontrolujte svůj e-mail.');
+        navigateTo('account');
+    }
+}
+</script>
 
         /* ==========================================================================
            9. ADMIN PRODUCT MANAGEMENT LOGIC
