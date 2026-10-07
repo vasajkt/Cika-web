@@ -1087,7 +1087,28 @@ await fetchProductsFromSupabase();
 renderFeaturedProducts();
 renderShop();
 renderAdminProducts();
-            
+  document.getElementById('account-login-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('account-email').value.trim();
+    const password = document.getElementById('account-password').value;
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password
+    });
+
+    if (error) {
+        console.error('Chyba při přihlášení:', error);
+        showToast('Nesprávný e-mail nebo heslo.');
+        return;
+    }
+
+    if (data.user) {
+        showToast('Úspěšně přihlášeno.');
+        navigateTo('account');
+    }
+});          
             // Handle Hash Navigation
             window.addEventListener('hashchange', handleHashRoute);
             handleHashRoute();
@@ -1115,19 +1136,6 @@ function navigateTo(viewId, scrollSectionId = null) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 }
-
-
-// Přihlášení uživatele
-document.getElementById('account-login-form')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const email = document.getElementById('account-email').value.trim();
-    const password = document.getElementById('account-password').value;
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password
-    });
 
     if (error) {
         console.error('Chyba při přihlášení:', error);
