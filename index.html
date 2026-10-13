@@ -1121,9 +1121,7 @@
         /* ==========================================================================
            2. SUPABASE INTEGRATION STUBS (Ready for production connection)
            ========================================================================== */
-        // TODO: Replace with Supabase Client SDK instance when deploying
-        // const supabase = createClient('https://YOUR-PROJECT.supabase.co', 'YOUR-ANON-KEY')
-        
+    
        async function fetchProductsFromSupabase() {
     const { data, error } = await supabase
         .from('products')
