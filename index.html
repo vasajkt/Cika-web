@@ -1592,6 +1592,18 @@ function toggleMobileMenu() {
     const address = `${street}`;
 
     // 1. Vytvoření objednávky
+    
+    // 1. Zjištění přihlášeného zákazníka
+    const { data: { user }, error: userError } =
+        await window.supabaseClient.auth.getUser();
+
+    if (userError) {
+        console.error("Chyba při ověřování zákazníka:", userError);
+        showToast("Nepodařilo se ověřit účet. Zkuste to prosím znovu.");
+        return;
+    }
+
+    // 2. Vytvoření objednávky
     const { data: order, error: orderError } = await window.supabaseClient
         .from('orders')
         .insert([{
@@ -1603,10 +1615,18 @@ function toggleMobileMenu() {
             postal_code: zip,
             note: `${note}${shipping ? ` Doprava: ${shipping}.` : ''}${payment ? ` Platba: ${payment}.` : ''}`,
             total: total,
-            status: 'Nová'
+            status: 'Nová',
+            user_id: user?.id ?? null
         }])
         .select()
         .single();
+
+    if (orderError) {
+        console.error("Chyba při vytváření objednávky:", orderError);
+        showToast("Objednávku se nepodařilo odeslat. Zkuste to prosím znovu.");
+        return;
+    }
+
 
     if (orderError) {
         console.error("Chyba při vytváření objednávky:", orderError);
