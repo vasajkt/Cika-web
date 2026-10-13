@@ -1643,11 +1643,16 @@ function toggleMobileMenu() {
     const shipping = document.querySelector('input[name="shipping"]:checked')?.value || '';
     const payment = document.querySelector('input[name="payment"]:checked')?.value || '';
 
-    const shippingPrices = {
-        "Zásilkovna": 79
-    };
+   
+const shippingPrices = {
+    "Zásilkovna": 79,
+    "Balíkovna CZ": 69,
+    "DPD Doručení na adresu": 129
+};
 
-    const shippingPrice = shippingPrices[shipping] || 0;
+const shippingPrice = shippingPrices[shipping] ?? 0;
+const paymentPrice = payment === "Dobírka při převzetí" ? 39 : 0;
+
 
     const productsTotal = cart.reduce((sum, item) => {
         return sum + (Number(item.price) * Number(item.qty));
