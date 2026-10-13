@@ -1186,6 +1186,19 @@ await fetchProductsFromSupabase();
 renderFeaturedProducts();
 renderShop();
 renderAdminProducts();
+            // 1. Kontrola už existujícího přihlášení
+const { data: { session }, error } =
+    await window.supabaseClient.auth.getSession();
+
+if (error) {
+    console.error('Nepodařilo se načíst přihlášení:', error);
+}
+
+if (session?.user) {
+    showAccountProfile(session.user);
+} else {
+    showAccountLogin();
+}
  document.getElementById('account-login-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
