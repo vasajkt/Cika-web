@@ -1124,7 +1124,7 @@ console.log("ČIKA TEST — klient:", typeof window.supabaseClient.from);
            ========================================================================== */
     
        async function fetchProductsFromSupabase() {
-    const { data, error } = await supabase
+    const { data, error } = await window.supabaseClient
         .from('products')
         .select('*')
         .eq('active', true)
