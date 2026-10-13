@@ -1212,6 +1212,40 @@ renderAdminProducts();
             window.addEventListener('hashchange', handleHashRoute);
             handleHashRoute();
         });
+
+function showAccountProfile(user) {
+    const loginPanel = document.getElementById('account-login-panel');
+    const profilePanel = document.getElementById('account-profile-panel');
+    const emailElement = document.getElementById('account-profile-email');
+
+    if (!loginPanel || !profilePanel || !emailElement) {
+        console.error('Nepodařilo se najít prvky zákaznického účtu.');
+        return;
+    }
+
+    emailElement.textContent = user.email || '';
+    loginPanel.classList.add('hidden');
+    profilePanel.classList.remove('hidden');
+}
+
+function showAccountLogin() {
+    document.getElementById('account-profile-panel')?.classList.add('hidden');
+    document.getElementById('account-login-panel')?.classList.remove('hidden');
+}
+
+async function handleLogout() {
+    const { error } = await window.supabaseClient.auth.signOut();
+
+    if (error) {
+        console.error('Chyba při odhlášení:', error);
+        showToast('Odhlášení se nezdařilo.');
+        return;
+    }
+
+    showAccountLogin();
+    showToast('Byl jsi odhlášen.');
+}
+
 function navigateTo(viewId, scrollSectionId = null) {
 
     // Administrace je dostupná pouze administrátorovi.
