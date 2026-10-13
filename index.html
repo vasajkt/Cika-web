@@ -1243,10 +1243,72 @@ function showAccountProfile(user) {
        emailElement.textContent = user.email || '';
     loginPanel.classList.add('hidden');
     profilePanel.classList.remove('hidden');
+   
     loadAccountOrders();
 }
 
+async function loadAccountOrders() {
+    const container = document.getElementById('account-orders');
+    if (!container) return;
+
+    container.textContent = 'Načítám objednávky...';
+
+    const { data: { user }, error: userError } =
+        await window.supabaseClient.auth.getUser();
+
+    if (userError || !user) {
+        container.textContent = 'Pro zobrazení objednávek se přihlas.';
+        return;
+    }
+
+    const { data: orders, error } = await window.supabaseClient
+        .from('orders')
+        .select('id, created_at, total, status')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Chyba při načítání objednávek:', error);
+        container.textContent = 'Objednávky se nepodařilo načíst.';
+        return;
+    }
+
+    if (!orders || orders.length === 0) {
+        container.textContent = 'Zatím tu nemáš žádné objednávky.';
+        return;
+    }
+
+    container.replaceChildren();
+
+    orders.forEach(order => {
+        const card = document.createElement('div');
+        card.className = 'rounded-xl border border-beige-dark/60 bg-white/60 p-4';
+
+        const title = document.createElement('p');
+        title.className = 'font-semibold text-charcoal';
+        title.textContent = 'Objednávka ' + order.id.slice(0, 8);
+
+        const date = document.createElement('p');
+        date.className = 'mt-1 text-sm text-charcoal/70';
+        date.textContent = 'Datum: ' +
+            new Date(order.created_at).toLocaleDateString('cs-CZ');
+
+        const total = document.createElement('p');
+        total.className = 'mt-1 text-sm text-charcoal';
+        total.textContent = 'Celkem: ' +
+            Number(order.total).toLocaleString('cs-CZ') + ' Kč';
+
+        const status = document.createElement('p');
+        status.className = 'mt-1 text-sm text-charcoal';
+        status.textContent = 'Stav: ' + (order.status || 'Neznámý');
+
+        card.append(title, date, total, status);
+        container.appendChild(card);
+    });
+}
+
 function showAccountLogin() {
+
     document.getElementById('account-profile-panel')?.classList.add('hidden');
     document.getElementById('account-login-panel')?.classList.remove('hidden');
 }
