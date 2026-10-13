@@ -1521,7 +1521,7 @@ function toggleMobileMenu() {
     const address = `${street}`;
 
     // 1. Vytvoření objednávky
-    const { data: order, error: orderError } = await supabase
+    const { data: order, error: orderError } = await window.supabaseClient
         .from('orders')
         .insert([{
             customer_name: fullName,
@@ -1552,7 +1552,7 @@ function toggleMobileMenu() {
         unit_price: Number(item.price)
     }));
 
-    const { error: itemsError } = await supabase
+    const { error: itemsError } = await window.supabaseClient
         .from('order_items')
         .insert(orderItems);
 
@@ -1619,7 +1619,7 @@ async function handleRegisterSubmit(e) {
         return;
     }
 
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await window.supabaseClient.auth.signUp({
         email: email,
         password: password
     });
