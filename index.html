@@ -1619,10 +1619,15 @@ async function handleRegisterSubmit(e) {
         return;
     }
 
-    const { data, error } = await window.supabaseClient.auth.signUp({
-        email: email,
-        password: password
-    });
+   
+const { data, error } = await window.supabaseClient.auth.signUp({
+    email: email,
+    password: password,
+    options: {
+        emailRedirectTo: 'https://cika-web.vasajkt.workers.dev/'
+    }
+});
+
 
     if (error) {
         console.error('Chyba při registraci:', error);
