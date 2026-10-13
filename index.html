@@ -1658,7 +1658,7 @@ const paymentPrice = payment === "Dobírka při převzetí" ? 39 : 0;
         return sum + (Number(item.price) * Number(item.qty));
     }, 0);
 
-    const total = productsTotal + shippingPrice;
+   const total = productsTotal + shippingPrice + paymentPrice;
 
     const fullName = `${firstname} ${lastname}`.trim();
     const address = `${street}`;
