@@ -712,64 +712,65 @@ console.log("ČIKA TEST — klient:", typeof window.supabaseClient.from);
        
 <div id="account-login-panel">
 
-            <div class="text-center mb-8">
-                <h1 class="text-3xl font-serif-title font-semibold text-charcoal">
-                    Můj účet
-                </h1>
-                <p class="text-sm text-charcoal/70 mt-2">
-                    Přihlaste se ke svému účtu Čika
-                </p>
-            </div>
+          
+<div class="max-w-md mx-auto bg-cream p-8 rounded-2xl border border-beige-dark/60 shadow-sm">
 
-            <form id="account-login-form" class="space-y-5">
-
-                <div>
-                    <label for="account-email"
-                           class="block text-xs font-medium text-charcoal mb-2">
-                        E-mail
-                    </label>
-                    <input
-                        type="email"
-                        id="account-email"
-                        required
-                        class="w-full px-4 py-3 rounded-lg border border-beige-dark bg-white focus:outline-none focus:ring-2 focus:ring-rose/40"
-                        placeholder="vas@email.cz">
-                </div>
-
-                <div>
-                    <label for="account-password"
-                           class="block text-xs font-medium text-charcoal mb-2">
-                        Heslo
-                    </label>
-                    <input
-                        type="password"
-                        id="account-password"
-                        required
-                        class="w-full px-4 py-3 rounded-lg border border-beige-dark bg-white focus:outline-none focus:ring-2 focus:ring-rose/40"
-                        placeholder="••••••••">
-                </div>
-
-                <button
-                    type="submit"
-                    class="w-full py-3 rounded-lg bg-cappuccino text-white font-medium hover:bg-cappuccino-dark transition">
-                    Přihlásit se
-                </button>
-
-            </form>
-
-            <div class="text-center mt-6">
-                <p class="text-xs text-charcoal/60">
-                    Ještě nemáte účet?
-                </p>
-
-                <button
-                    type="button"
-                    class="mt-2 text-sm text-cappuccino hover:text-cappuccino-dark font-medium"
-                    onclick="navigateTo('register')">
-                    Vytvořit účet
-                </button>
-            </div>
+    <div id="account-login-panel">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-serif-title font-semibold text-charcoal">Můj účet</h1>
+            <p class="text-sm text-charcoal/70 mt-2">Přihlaste se ke svému účtu Čika</p>
         </div>
+
+        <form id="account-login-form" class="space-y-5">
+            <div>
+                <label for="account-email" class="block text-xs font-medium text-charcoal mb-2">E-mail</label>
+                <input type="email" id="account-email" autocomplete="email" required
+                    class="w-full px-4 py-3 rounded-lg border border-beige-dark bg-white"
+                    placeholder="vas@email.cz">
+            </div>
+
+            <div>
+                <label for="account-password" class="block text-xs font-medium text-charcoal mb-2">Heslo</label>
+                <input type="password" id="account-password" autocomplete="current-password" required
+                    class="w-full px-4 py-3 rounded-lg border border-beige-dark bg-white"
+                    placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="w-full py-3 rounded-lg bg-cappuccino text-white font-medium hover:bg-cappuccino-dark transition">
+                Přihlásit se
+            </button>
+        </form>
+
+        <div class="text-center mt-6">
+            <p class="text-xs text-charcoal/60">Ještě nemáte účet?</p>
+            <button type="button" class="mt-2 text-sm text-cappuccino hover:text-cappuccino-dark font-medium"
+                onclick="navigateTo('register')">Vytvořit účet</button>
+        </div>
+    </div>
+
+    <div id="account-profile-panel" class="hidden">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-serif-title font-semibold text-charcoal">Můj účet</h1>
+            <p class="text-sm text-charcoal/70 mt-2">Vítej ve svém účtu Čika. 🤎</p>
+        </div>
+
+        <div class="rounded-lg border border-beige-dark bg-white p-4 mb-6">
+            <p class="text-xs text-charcoal/60 mb-1">Přihlášený e-mail</p>
+            <p id="account-profile-email" class="text-sm font-medium text-charcoal break-words"></p>
+        </div>
+
+        <div class="border-t border-beige-dark/60 pt-5">
+            <h2 class="text-lg font-semibold text-charcoal mb-2">Moje objednávky</h2>
+            <p class="text-sm text-charcoal/70">Historii objednávek doplníme v dalším kroku.</p>
+        </div>
+
+        <button type="button" onclick="handleLogout()"
+            class="w-full mt-6 py-3 rounded-lg border border-beige-dark text-charcoal font-medium hover:bg-white transition">
+            Odhlásit se
+        </button>
+    </div>
+
+</div>
 
     </div>
         </section>
