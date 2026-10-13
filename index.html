@@ -755,10 +755,14 @@ console.log("ČIKA TEST — klient:", typeof window.supabaseClient.from);
             <p id="account-profile-email" class="text-sm font-medium text-charcoal break-words"></p>
         </div>
 
-        <div class="border-t border-beige-dark/60 pt-5">
-            <h2 class="text-lg font-semibold text-charcoal mb-2">Moje objednávky</h2>
-            <p class="text-sm text-charcoal/70">Historii objednávek doplníme v dalším kroku.</p>
-        </div>
+       
+<div class="border-t border-beige-dark/60 pt-5">
+    <h2 class="text-lg font-semibold text-charcoal mb-2">Moje objednávky</h2>
+    <div id="account-orders" class="mt-4 space-y-4">
+        <p class="text-sm text-charcoal/70">Tvoje objednávky se zde zobrazí po načtení.</p>
+    </div>
+</div>
+
 
         <button type="button" onclick="handleLogout()"
             class="w-full mt-6 py-3 rounded-lg border border-beige-dark text-charcoal font-medium hover:bg-white transition">
