@@ -1825,12 +1825,40 @@ if (itemsError) {
             }
         }
 
-        function handleLoginSubmit(e) {
-            e.preventDefault();
-            // TODO: supabase.auth.signInWithPassword({ email, password })
-            showToast("Přihlášení proběhlo úspěšně");
-            navigateTo('account');
-        }
+       async function handleLoginSubmit(e) {
+    e.preventDefault();
+
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+        email,
+        password
+    });
+
+    if (error) {
+        console.error('Chyba při přihlášení:', error);
+        showToast('Nesprávný e-mail nebo heslo.');
+        return;
+    }
+
+    const { data: isAdmin, error: adminError } =
+        await window.supabaseClient.rpc('is_admin');
+
+    if (adminError) {
+        console.error('Chyba při ověření administrátora:', adminError);
+    }
+
+    if (!adminError && isAdmin === true) {
+        showToast('Úspěšně přihlášeno.');
+        navigateTo('admin');
+        return;
+    }
+
+    showAccountProfile(data.user);
+    navigateTo('account');
+    showToast('Úspěšně přihlášeno.');
+}
 async function handleRegisterSubmit(e) {
     e.preventDefault();
 
