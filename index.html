@@ -1212,7 +1212,7 @@ if (session?.user) {
 } else {
     showAccountLogin();
 }
- document.getElementById('account-login-form')?.addEventListener('submit', async (e) => {
+document.getElementById('account-login-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const email = document.getElementById('account-email').value.trim();
@@ -1222,6 +1222,29 @@ if (session?.user) {
         email,
         password
     });
+
+    if (error) {
+        console.error('Chyba při přihlášení:', error);
+        showToast('Nesprávný e-mail nebo heslo.');
+        return;
+    }
+
+    const { data: isAdmin, error: adminError } =
+        await window.supabaseClient.rpc('is_admin');
+
+    if (adminError) {
+        console.error('Chyba při ověření administrátora:', adminError);
+    }
+
+    if (!adminError && isAdmin === true) {
+        showToast('Úspěšně přihlášeno.');
+        navigateTo('admin');
+        return;
+    }
+
+    showAccountProfile(data.user);
+    showToast('Úspěšně přihlášeno.');
+});
 
     if (error) {
         console.error('Chyba při přihlášení:', error);
