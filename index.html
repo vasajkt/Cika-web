@@ -1202,6 +1202,10 @@ console.log("ČIKA TEST — klient:", typeof window.supabaseClient.from);
            ========================================================================== */
         window.addEventListener('DOMContentLoaded', async () => {
            loadCartFromStorage();
+            document.querySelectorAll('input[name="shipping"], input[name="payment"]')
+    .forEach(input => input.addEventListener('change', updateCheckoutTotals));
+
+updateCheckoutTotals();
 await fetchProductsFromSupabase();
 renderFeaturedProducts();
 renderShop();
