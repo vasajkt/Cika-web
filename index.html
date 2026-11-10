@@ -1721,12 +1721,12 @@ function toggleMobileMenu() {
    
 const shippingPrices = {
     "Zásilkovna": 79,
-    "Balíkovna CZ": 69,
-    "DPD Doručení na adresu": 129
+    "Balíkovna": 69,
+    "DPD Kurýr": 129
 };
 
 const shippingPrice = shippingPrices[shipping] ?? 0;
-const paymentPrice = payment === "Dobírka při převzetí" ? 39 : 0;
+const paymentPrice = payment === "Dobírka" ? 39 : 0;
 
 
     const productsTotal = cart.reduce((sum, item) => {
