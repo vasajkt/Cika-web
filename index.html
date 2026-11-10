@@ -1355,12 +1355,31 @@ async function handleLogout() {
     showToast('Byl jsi odhlášen.');
 }
 
-function navigateTo(viewId, scrollSectionId = null) {
+async function openAdminView() {
+    const { data: isAdmin, error } =
+        await window.supabaseClient.rpc('is_admin');
 
-    // Administrace je dostupná pouze administrátorovi.
-    if (viewId === 'admin') {
+    if (error || isAdmin !== true) {
         showToast('Administrace je dostupná pouze administrátorovi.');
-        navigateTo('login');
+        window.location.hash = 'home';
+        showView('home');
+        return;
+    }
+
+    showView('admin');
+
+    if (typeof loadAdminOrders === 'function') {
+        await loadAdminOrders();
+    }
+}
+
+function navigateTo(viewId, scrollSectionId = null) {
+    if (viewId === 'admin') {
+        if (window.location.hash === '#admin') {
+            void openAdminView();
+        } else {
+            window.location.hash = 'admin';
+        }
         return;
     }
 
@@ -1379,11 +1398,16 @@ function navigateTo(viewId, scrollSectionId = null) {
     }
 }
 
+function handleHashRoute() {
+    const hash = window.location.hash.replace('#', '') || 'home';
 
-        function handleHashRoute() {
-            const hash = window.location.hash.replace('#', '') || 'home';
-            showView(hash);
-        }
+    if (hash === 'admin') {
+        void openAdminView();
+        return;
+    }
+
+    showView(hash);
+}
 
         function showView(viewId) {
             const views = document.querySelectorAll('.spa-view');
