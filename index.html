@@ -1909,7 +1909,110 @@ const { data, error } = await window.supabaseClient.auth.signUp({
                 `).join('');
             }
         }
+async function loadAdminOrders() {
+    const container = document.getElementById('admin-orders-list');
+    if (!container) return;
 
+    container.textContent = 'Objednávky se načítají…';
+
+    const { data: orders, error } = await window.supabaseClient
+        .from('orders')
+        .select(`
+            id, created_at, total, status,
+            customer_name, customer_email, customer_phone,
+            shipping_address, city, postal_code, note,
+            order_items(id, product_name, quantity, unit_price)
+        `)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Chyba při načítání objednávek v administraci:', error);
+        container.textContent = 'Objednávky se nepodařilo načíst.';
+        return;
+    }
+
+    if (!orders || orders.length === 0) {
+        container.textContent = 'Zatím tu nejsou žádné objednávky.';
+        return;
+    }
+
+    container.replaceChildren();
+
+    orders.forEach(order => {
+        const card = document.createElement('div');
+        card.className = 'rounded-xl border border-beige-dark/60 bg-white/60 p-4';
+
+        const title = document.createElement('p');
+        title.className = 'font-semibold text-charcoal';
+        title.textContent = `Objednávka ${order.id.slice(0, 8)}`;
+
+        const date = document.createElement('p');
+        date.className = 'mt-1 text-sm text-charcoal/70';
+        date.textContent =
+            `Datum: ${new Date(order.created_at).toLocaleString('cs-CZ')}`;
+
+        const total = document.createElement('p');
+        total.className = 'mt-1 text-sm text-charcoal';
+        total.textContent =
+            `Celkem: ${Number(order.total).toLocaleString('cs-CZ')} Kč`;
+
+        const status = document.createElement('p');
+        status.className = 'mt-1 text-sm text-charcoal';
+        status.textContent = `Stav: ${order.status || 'Neznámý'}`;
+
+        const details = document.createElement('details');
+        details.className = 'mt-3 border-t border-beige-dark/40 pt-3';
+
+        const summary = document.createElement('summary');
+        summary.className = 'cursor-pointer text-sm font-medium text-charcoal';
+        summary.textContent = 'Zobrazit údaje a položky';
+
+        const content = document.createElement('div');
+        content.className = 'mt-3 space-y-1 text-sm text-charcoal/80';
+
+        [
+            ['Zákazník', order.customer_name],
+            ['E-mail', order.customer_email],
+            ['Telefon', order.customer_phone],
+            ['Adresa', order.shipping_address],
+            ['Město', order.city],
+            ['PSČ', order.postal_code],
+            ['Poznámka', order.note]
+        ].forEach(([label, value]) => {
+            if (!value) return;
+            const line = document.createElement('p');
+            line.textContent = `${label}: ${value}`;
+            content.appendChild(line);
+        });
+
+        const itemsHeading = document.createElement('p');
+        itemsHeading.className = 'pt-2 font-semibold';
+        itemsHeading.textContent = 'Položky objednávky';
+        content.appendChild(itemsHeading);
+
+        const items = order.order_items || [];
+
+        if (items.length === 0) {
+            const empty = document.createElement('p');
+            empty.textContent = 'U této objednávky nejsou uložené žádné položky.';
+            content.appendChild(empty);
+        } else {
+            items.forEach(item => {
+                const line = document.createElement('p');
+                const lineTotal = Number(item.unit_price) * Number(item.quantity);
+                line.textContent =
+                    `${item.quantity}× ${item.product_name} — ` +
+                    `${Number(item.unit_price).toLocaleString('cs-CZ')} Kč/ks ` +
+                    `(celkem ${lineTotal.toLocaleString('cs-CZ')} Kč)`;
+                content.appendChild(line);
+            });
+        }
+
+        details.append(summary, content);
+        card.append(title, date, total, status, details);
+        container.appendChild(card);
+    });
+}
         function toggleAddProductModal(show) {
             const modal = document.getElementById('admin-product-modal');
             if (modal) {
