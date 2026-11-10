@@ -1273,11 +1273,7 @@ async function loadAccountOrders() {
         return;
     }
 
-    if (!orders || orders.length === 0) {
-        container.textContent = 'Zatím tu nemáš žádné objednávky.';
-        return;
-    }
-container.replaceChildren();
+   container.replaceChildren();
 
 orders.forEach(order => {
     const card = document.createElement('div');
@@ -1302,8 +1298,41 @@ orders.forEach(order => {
     status.textContent = 'Stav: ' + (order.status || 'Neznámý');
 
     card.append(title, date, total, status);
+
+    const items = order.order_items || [];
+
+    if (items.length > 0) {
+        const details = document.createElement('details');
+        details.className = 'mt-3 border-t border-beige-dark/40 pt-3';
+
+        const summary = document.createElement('summary');
+        summary.className = 'cursor-pointer text-sm font-medium text-charcoal';
+        summary.textContent = `Zobrazit položky (${items.length})`;
+
+        const list = document.createElement('ul');
+        list.className = 'mt-2 space-y-2';
+
+        items.forEach(item => {
+            const row = document.createElement('li');
+            row.className = 'text-sm text-charcoal/80';
+            row.textContent =
+                `${item.quantity}× ${item.product_name} — ` +
+                `${Number(item.unit_price).toLocaleString('cs-CZ')} Kč/ks`;
+            list.appendChild(row);
+        });
+
+        details.append(summary, list);
+        card.appendChild(details);
+    } else {
+        const message = document.createElement('p');
+        message.className = 'mt-3 border-t border-beige-dark/40 pt-3 text-sm text-charcoal/60';
+        message.textContent = 'Položky u této objednávky nejsou uložené.';
+        card.appendChild(message);
+    }
+
     container.appendChild(card);
 });
+
    
 }
 
