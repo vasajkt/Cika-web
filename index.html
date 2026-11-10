@@ -1277,34 +1277,34 @@ async function loadAccountOrders() {
         container.textContent = 'Zatím tu nemáš žádné objednávky.';
         return;
     }
+container.replaceChildren();
 
-    container.replaceChildren();
+orders.forEach(order => {
+    const card = document.createElement('div');
+    card.className = 'rounded-xl border border-beige-dark/60 bg-white/60 p-4';
 
-    orders.forEach(order => {
-        const card = document.createElement('div');
-        card.className = 'rounded-xl border border-beige-dark/60 bg-white/60 p-4';
+    const title = document.createElement('p');
+    title.className = 'font-semibold text-charcoal';
+    title.textContent = 'Objednávka ' + order.id.slice(0, 8);
 
-        const title = document.createElement('p');
-        title.className = 'font-semibold text-charcoal';
-        title.textContent = 'Objednávka ' + order.id.slice(0, 8);
+    const date = document.createElement('p');
+    date.className = 'mt-1 text-sm text-charcoal/70';
+    date.textContent = 'Datum: ' +
+        new Date(order.created_at).toLocaleDateString('cs-CZ');
 
-        const date = document.createElement('p');
-        date.className = 'mt-1 text-sm text-charcoal/70';
-        date.textContent = 'Datum: ' +
-            new Date(order.created_at).toLocaleDateString('cs-CZ');
+    const total = document.createElement('p');
+    total.className = 'mt-1 text-sm text-charcoal';
+    total.textContent = 'Celkem: ' +
+        Number(order.total).toLocaleString('cs-CZ') + ' Kč';
 
-        const total = document.createElement('p');
-        total.className = 'mt-1 text-sm text-charcoal';
-        total.textContent = 'Celkem: ' +
-            Number(order.total).toLocaleString('cs-CZ') + ' Kč';
+    const status = document.createElement('p');
+    status.className = 'mt-1 text-sm text-charcoal';
+    status.textContent = 'Stav: ' + (order.status || 'Neznámý');
 
-        const status = document.createElement('p');
-        status.className = 'mt-1 text-sm text-charcoal';
-        status.textContent = 'Stav: ' + (order.status || 'Neznámý');
-
-        card.append(title, date, total, status);
-        container.appendChild(card);
-    });
+    card.append(title, date, total, status);
+    container.appendChild(card);
+});
+   
 }
 
 function showAccountLogin() {
