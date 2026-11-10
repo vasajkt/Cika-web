@@ -1997,7 +1997,15 @@ const newOrders = orders.filter(order =>
 const incompleteOrders = orders.filter(
     order => (order.order_items || []).length === 0
 ).length;
-
+console.log('ADMIN STATISTIKY', {
+    pocetObjednavek: orders.length,
+    stavy: orders.map(order => ({
+        stav: order.status,
+        polozek: order.order_items?.length
+    })),
+    nove: newOrders,
+    bezPolozek: incompleteOrders
+});
 document.getElementById('admin-monthly-revenue').textContent =
     paidThisMonth.toLocaleString('cs-CZ') + ' Kč';
 
