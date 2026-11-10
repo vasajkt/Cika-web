@@ -1263,7 +1263,7 @@ async function loadAccountOrders() {
 
     const { data: orders, error } = await window.supabaseClient
         .from('orders')
-        .select('id, created_at, total, status')
+       .select('id, created_at, total, status, order_items(id, product_name, quantity, unit_price)')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
