@@ -1246,17 +1246,7 @@ document.getElementById('account-login-form')?.addEventListener('submit', async 
     showToast('Úspěšně přihlášeno.');
 });
 
-    if (error) {
-        console.error('Chyba při přihlášení:', error);
-        showToast('Nesprávný e-mail nebo heslo.');
-        return;
-    }
-
-    if (data.user) {
-        showAccountProfile(data.user);
-        showToast('Úspěšně přihlášeno.');
-    }
-});
+   
             // Handle Hash Navigation
             window.addEventListener('hashchange', handleHashRoute);
             handleHashRoute();
