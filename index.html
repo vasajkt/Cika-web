@@ -2131,7 +2131,7 @@ statusSelect.addEventListener('change', async () => {
         }
 
         details.append(summary, content);
-        card.append(title, date, total, status, details);
+        card.append(title, date, total, status, statusSelect, details);
         container.appendChild(card);
     });
 }
