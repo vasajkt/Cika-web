@@ -2039,7 +2039,49 @@ document.getElementById('admin-incomplete-order-count').textContent = incomplete
         const status = document.createElement('p');
         status.className = 'mt-1 text-sm text-charcoal';
         status.textContent = `Stav: ${order.status || 'Neznámý'}`;
+const statusLabels = {
+    'Nová': 'Nová',
+    pending: 'Čeká na platbu',
+    paid: 'Zaplaceno',
+    processing: 'Zpracovává se',
+    shipped: 'Odesláno',
+    delivered: 'Doručeno',
+    cancelled: 'Zrušeno'
+};
 
+const statusSelect = document.createElement('select');
+statusSelect.className =
+    'mt-2 rounded-lg border border-beige-dark bg-white px-3 py-2 text-sm';
+
+Object.entries(statusLabels).forEach(([value, label]) => {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = label;
+    statusSelect.appendChild(option);
+});
+
+statusSelect.value = order.status || 'Nová';
+
+statusSelect.addEventListener('change', async () => {
+    const previousStatus = order.status || 'Nová';
+    const newStatus = statusSelect.value;
+
+    const { error } = await window.supabaseClient
+        .from('orders')
+        .update({ status: newStatus })
+        .eq('id', order.id);
+
+    if (error) {
+        console.error('Chyba při změně stavu objednávky:', error);
+        showToast('Stav objednávky se nepodařilo uložit.');
+        statusSelect.value = previousStatus;
+        return;
+    }
+
+    order.status = newStatus;
+    status.textContent = `Stav: ${statusLabels[newStatus]}`;
+    showToast('Stav objednávky byl uložen.');
+});
         const details = document.createElement('details');
         details.className = 'mt-3 border-t border-beige-dark/40 pt-3';
 
