@@ -614,7 +614,14 @@ console.log("ČIKA TEST — klient:", typeof window.supabaseClient.from);
                             <div class="border-t border-beige-dark/60 pt-3 space-y-2 text-sm">
                                 <div class="flex justify-between text-xs text-charcoal/70">
                                     <span>Produkty:</span>
-                                    <span id="checkout-subtotal">0 Kč</span>
+                                  <div class="flex justify-between text-xs text-charcoal/70">
+    <span>Doprava:</span>
+    <span id="checkout-shipping-cost">0 Kč</span>
+</div>
+<div class="flex justify-between text-xs text-charcoal/70">
+    <span>Platba:</span>
+    <span id="checkout-payment-cost">0 Kč</span>
+</div>  <span id="checkout-subtotal">0 Kč</span>
                                 </div>
                                 <div class="flex justify-between font-bold text-base text-charcoal pt-2">
                                     <span>Celková cena:</span>
