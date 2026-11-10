@@ -1705,6 +1705,33 @@ function toggleMobileMenu() {
         /* ==========================================================================
            7. CHECKOUT & SUBMISSION (Supabase DB Insertion Prepared)
            ========================================================================== */
+       function updateCheckoutTotals() {
+    const shipping = document.querySelector('input[name="shipping"]:checked')?.value || '';
+    const payment = document.querySelector('input[name="payment"]:checked')?.value || '';
+
+    const shippingPrices = {
+        "Zásilkovna": 79,
+        "Balíkovna": 69,
+        "DPD Kurýr": 129
+    };
+
+    const productsTotal = cart.reduce(
+        (sum, item) => sum + Number(item.price) * Number(item.qty),
+        0
+    );
+
+    const shippingPrice = shippingPrices[shipping] ?? 0;
+    const paymentPrice = payment === "Dobírka" ? 39 : 0;
+
+    document.getElementById('checkout-subtotal').textContent =
+        productsTotal.toLocaleString('cs-CZ') + ' Kč';
+    document.getElementById('checkout-shipping-cost').textContent =
+        shippingPrice.toLocaleString('cs-CZ') + ' Kč';
+    document.getElementById('checkout-payment-cost').textContent =
+        paymentPrice.toLocaleString('cs-CZ') + ' Kč';
+    document.getElementById('checkout-total').textContent =
+        (productsTotal + shippingPrice + paymentPrice).toLocaleString('cs-CZ') + ' Kč';
+}
         async function handleCheckoutSubmit(e) {
     e.preventDefault();
 
