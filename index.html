@@ -1166,8 +1166,22 @@ console.log("ČIKA TEST — klient:", typeof window.supabaseClient.from);
         /* ==========================================================================
            2. SUPABASE INTEGRATION STUBS (Ready for production connection)
            ========================================================================== */
-    
-       async function fetchProductsFromSupabase() {
+    async function fetchProductsFromSupabase() {
+    const { data: categories, error: categoriesError } =
+        await window.supabaseClient
+            .from('categories')
+            .select('id, name');
+
+    if (categoriesError) {
+        console.error('Chyba při načítání kategorií:', categoriesError);
+        showToast('Kategorie se nepodařilo načíst.');
+        return;
+    }
+
+    const categoryNames = new Map(
+        (categories || []).map(category => [category.id, category.name])
+    );
+
     const { data, error } = await window.supabaseClient
         .from('products')
         .select('*')
@@ -1175,27 +1189,27 @@ console.log("ČIKA TEST — klient:", typeof window.supabaseClient.from);
         .order('created_at', { ascending: true });
 
     if (error) {
-        console.error("Chyba při načítání produktů:", error);
-        showToast("Produkty se nepodařilo načíst.");
+        console.error('Chyba při načítání produktů:', error);
+        showToast('Produkty se nepodařilo načíst.');
         return;
     }
 
-    if (data) {
-        products = data.map(product => ({
-            id: product.id,
-            title: product.name,
-            category: "Produkty",
-            price: Number(product.price),
-            availability: product.stock > 0 ? "Skladem" : "Vyprodáno",
-            image: product.image_url,
-            description: product.description
-        }));
+    products = (data || []).map(product => ({
+        id: product.id,
+        title: product.name,
+        category: categoryNames.get(product.category_id) || 'Bez kategorie',
+        price: Number(product.price),
+        stock: Number(product.stock) || 0,
+        availability: Number(product.stock) > 0 ? 'Skladem' : 'Vyprodáno',
+        image: product.image_url,
+        description: product.description
+    }));
 
-        renderFeaturedProducts();
-        renderShop();
-               renderAdminProducts();
-    }
+    renderFeaturedProducts();
+    renderShop();
+    renderAdminProducts();
 }
+      
 
         /* ==========================================================================
            3. APPLICATION INITIALIZATION & ROUTING
