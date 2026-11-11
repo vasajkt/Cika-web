@@ -2181,25 +2181,76 @@ statusSelect.addEventListener('change', async () => {
             }
         }
 
-        function handleAdminSaveProduct(e) {
-            e.preventDefault();
-            const newProduct = {
-                id: `cika-${Date.now()}`,
-                title: document.getElementById('admin-p-title').value,
-                category: document.getElementById('admin-p-category').value,
-                price: parseFloat(document.getElementById('admin-p-price').value),
-                availability: document.getElementById('admin-p-stock').value,
-                image: document.getElementById('admin-p-img').value,
-                description: document.getElementById('admin-p-desc').value
-            };
+        async function handleAdminSaveProduct(e) {
+    e.preventDefault();
 
-            products.unshift(newProduct);
-            renderAdminProducts();
-            renderFeaturedProducts();
-            renderShop();
-            toggleAddProductModal(false);
-            showToast("Produkt byl úspěšně přidán");
-        }
+    const title = document.getElementById('admin-p-title').value.trim();
+    const categoryName = document.getElementById('admin-p-category').value;
+    const price = Number(document.getElementById('admin-p-price').value);
+    const availability = document.getElementById('admin-p-stock').value;
+    const imageUrl = document.getElementById('admin-p-img').value.trim();
+    const description = document.getElementById('admin-p-desc').value.trim();
+
+    const categoryResult = await window.supabaseClient
+        .from('categories')
+        .select('id')
+        .eq('name', categoryName)
+        .maybeSingle();
+
+    if (categoryResult.error) {
+        console.error('Chyba při načítání kategorie:', categoryResult.error);
+        showToast('Kategorii se nepodařilo načíst.');
+        return;
+    }
+
+    const baseSlug = title
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '') || 'produkt';
+
+    const slugResult = await window.supabaseClient
+        .from('products')
+        .select('id')
+        .eq('slug', baseSlug)
+        .limit(1);
+
+    if (slugResult.error) {
+        console.error('Chyba při ověřování adresy produktu:', slugResult.error);
+        showToast('Produkt se nepodařilo uložit.');
+        return;
+    }
+
+    const slug = slugResult.data.length > 0
+        ? `${baseSlug}-${Date.now()}`
+        : baseSlug;
+
+    const { error } = await window.supabaseClient
+        .from('products')
+        .insert({
+            category_id: categoryResult.data?.id ?? null,
+            name: title,
+            slug,
+            description,
+            price,
+            stock: availability === 'Skladem' ? 1 : 0,
+            image_url: imageUrl,
+            active: true
+        });
+
+    if (error) {
+        console.error('Chyba při ukládání produktu:', error);
+        showToast('Produkt se nepodařilo uložit.');
+        return;
+    }
+
+    e.target.reset();
+    toggleAddProductModal(false);
+    await fetchProductsFromSupabase();
+    showToast('Produkt byl uložen do Supabase.');
+}
 
         function toggleStockStatus(index) {
             products[index].availability = products[index].availability === 'Skladem' ? 'Na zakázku' : 'Skladem';
