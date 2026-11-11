@@ -2252,21 +2252,53 @@ statusSelect.addEventListener('change', async () => {
     showToast('Produkt byl uložen do Supabase.');
 }
 
-        function toggleStockStatus(index) {
-            products[index].availability = products[index].availability === 'Skladem' ? 'Na zakázku' : 'Skladem';
-            renderAdminProducts();
-            renderShop();
-            showToast("Dostupnost byla upravena");
-        }
+      async function toggleStockStatus(index) {
+    const product = products[index];
+    if (!product) return;
 
-        function deleteAdminProduct(index) {
-            if (confirm("Opravdu si přejete tento produkt smazat?")) {
-                products.splice(index, 1);
-                renderAdminProducts();
-                renderShop();
-                showToast("Produkt byl smazán");
-            }
-        }
+    const newStock = product.availability === 'Skladem' ? 0 : 1;
+
+    const { error } = await window.supabaseClient
+        .from('products')
+        .update({
+            stock: newStock,
+            updated_at: new Date().toISOString()
+        })
+        .eq('id', product.id);
+
+    if (error) {
+        console.error('Chyba při změně dostupnosti:', error);
+        showToast('Dostupnost produktu se nepodařilo uložit.');
+        return;
+    }
+
+    await fetchProductsFromSupabase();
+    showToast(newStock > 0 ? 'Produkt je skladem.' : 'Produkt je vyprodaný.');
+}
+
+        async function deleteAdminProduct(index) {
+    const product = products[index];
+    if (!product) return;
+
+    if (!confirm(`Opravdu si přejete smazat produkt „${product.title}“?`)) {
+        return;
+    }
+
+    const { error } = await window.supabaseClient
+        .from('products')
+        .delete()
+        .eq('id', product.id);
+
+    if (error) {
+        console.error('Chyba při mazání produktu:', error);
+        showToast('Produkt se nepodařilo smazat.');
+        return;
+    }
+
+    await fetchProductsFromSupabase();
+    showToast('Produkt byl smazán.');
+}
+       
 
         /* ==========================================================================
            10. NEWSLETTER & CONTACT FORM HANDLERS
