@@ -1,5 +1,39 @@
 <!DOCTYPE html>
 <html lang="cs">
+
+
+
+    
+    <div id="launch-notice"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="launch-notice-title"
+     class="fixed inset-0 z-50 flex items-center justify-center bg-charcoal/70 p-4">
+
+    <div class="w-full max-w-md rounded-2xl border border-beige-dark bg-cream p-7 text-center shadow-2xl">
+        <h2 id="launch-notice-title"
+            class="mb-3 font-serif-title text-2xl font-semibold text-charcoal">
+            Web zatím není oficiálně spuštěn
+        </h2>
+
+        <p class="mb-6 text-sm leading-relaxed text-charcoal/75">
+            Na e-shopu Čika právě pracujeme. Obsah a funkce se ještě mohou měnit.
+            Děkujeme za pochopení.
+        </p>
+
+        <button type="button"
+                onclick="document.getElementById('launch-notice').remove()"
+                class="rounded-lg bg-cappuccino px-6 py-3 text-sm font-medium text-cream hover:bg-cappuccino-dark">
+            Rozumím
+        </button>
+    </div>
+</div>
+
+
+
+
+
+    
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
