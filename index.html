@@ -2198,8 +2198,7 @@ document.getElementById('admin-incomplete-order-count').textContent = incomplete
 
         const status = document.createElement('p');
         status.className = 'mt-1 text-sm text-charcoal';
-        const customerStatus =
-    order.status === 'Vyzvednuto' ? 'Doručeno' : (order.status || 'Neznámý');
+        
 status.textContent = 'Stav: ' + (order.status || 'Neznámý');
 const statusLabels = {
     'Nová': 'Nová',
