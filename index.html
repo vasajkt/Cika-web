@@ -828,6 +828,13 @@ console.log("ČIKA TEST — klient:", typeof window.supabaseClient.from);
             class="w-full mt-6 py-3 rounded-lg border border-beige-dark text-charcoal font-medium hover:bg-white transition">
             Odhlásit se
         </button>
+       <button
+    type="button"
+    onclick="handleDeleteAccount()"
+    class="w-full mt-3 py-3 rounded-lg border border-rose text-rose font-medium hover:bg-rose/10 transition"
+>
+    Zrušit účet
+</button>
     </div>
 
 </div>
@@ -2474,6 +2481,34 @@ window.handleForgotPassword = async function () {
 
     showToast('Poslali jsme vám e-mail s odkazem pro obnovu hesla.');
 };
+
+
+   <script>
+window.handleDeleteAccount = async function () {
+    const confirmed = confirm(
+        'Opravdu chcete účet trvale zrušit? Objednávky zůstanou v administraci anonymizované.'
+    );
+
+    if (!confirmed) return;
+
+    showToast('Ruším účet…');
+
+    const { error } = await window.supabaseClient.functions.invoke(
+        'delete-my-account'
+    );
+
+    if (error) {
+        console.error('Chyba při rušení účtu:', error);
+        showToast('Účet se nepodařilo zrušit. Zkuste to prosím znovu.');
+        return;
+    }
+
+    await window.supabaseClient.auth.signOut({ scope: 'local' });
+    showAccountLogin();
+    navigateTo('home');
+    showToast('Účet byl zrušen a objednávky anonymizovány.');
+};
+
 </script>
 </body>
 </html>
