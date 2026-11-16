@@ -1476,6 +1476,52 @@ function showAccountLogin() {
 }
 
 async function handleLogout() {
+   async function handleForgotPassword() {
+    const email = document.getElementById('account-email')?.value.trim();
+
+    if (!email) {
+        showToast('Nejdříve zadejte svůj e-mail.');
+        return;
+    }
+
+    const { error } = await window.supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: 'https://cika-web.vasajkt.workers.dev/'
+    });
+
+    if (error) {
+        console.error('Chyba při obnově hesla:', error);
+        showToast('E-mail pro obnovu hesla se nepodařilo odeslat.');
+        return;
+    }
+
+    showToast('Poslali jsme vám e-mail s odkazem pro obnovu hesla.');
+}
+
+async function handlePasswordResetSubmit(e) {
+    e.preventDefault();
+
+    const password = document.getElementById('reset-new-password').value;
+    const confirmation = document.getElementById('reset-confirm-password').value;
+
+    if (password !== confirmation) {
+        showToast('Zadaná hesla se neshodují.');
+        return;
+    }
+
+    const { data, error } = await window.supabaseClient.auth.updateUser({
+        password
+    });
+
+    if (error) {
+        console.error('Chyba při nastavení hesla:', error);
+        showToast('Nové heslo se nepodařilo uložit.');
+        return;
+    }
+
+    showToast('Heslo bylo změněno.');
+    showAccountProfile(data.user);
+    navigateTo('account');
+}
     const { error } = await window.supabaseClient.auth.signOut();
 
     if (error) {
