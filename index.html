@@ -1359,11 +1359,7 @@ document.getElementById('account-login-form')?.addEventListener('submit', async 
 
    
             // Handle Hash Navigation
-           window.supabaseClient.auth.onAuthStateChange((event) => {
-    if (event === 'PASSWORD_RECOVERY') {
-        showView('reset-password');
-    }
-});
+
             window.addEventListener('hashchange', handleHashRoute);
             handleHashRoute();
         });
