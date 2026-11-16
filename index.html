@@ -2482,7 +2482,6 @@ window.handleForgotPassword = async function () {
     showToast('Poslali jsme vám e-mail s odkazem pro obnovu hesla.');
 };
 
-
 window.handleDeleteAccount = async function () {
     const confirmed = confirm(
         'Opravdu chcete účet trvale zrušit? Objednávky zůstanou v administraci anonymizované.'
@@ -2492,7 +2491,7 @@ window.handleDeleteAccount = async function () {
 
     showToast('Ruším účet…');
 
-    const { error } = await window.supabaseClient.functions.invoke(
+    const { data, error } = await window.supabaseClient.functions.invoke(
         'delete-my-account'
     );
 
@@ -2505,8 +2504,14 @@ window.handleDeleteAccount = async function () {
     await window.supabaseClient.auth.signOut({ scope: 'local' });
     showAccountLogin();
     navigateTo('home');
-    showToast('Účet byl zrušen a objednávky anonymizovány.');
+
+    if (data?.emailSent) {
+        showToast('Účet byl zrušen. Potvrzení jsme poslali e-mailem.');
+    } else {
+        showToast('Účet byl zrušen, ale potvrzovací e-mail se nepodařilo odeslat.');
+    }
 };
+
 
 </script>
 </body>
