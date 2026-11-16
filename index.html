@@ -1923,9 +1923,11 @@ function toggleMobileMenu() {
 async function handleRegisterSubmit(e) {
     e.preventDefault();
 
-    const email = document.getElementById('register-email').value.trim();
-    const password = document.getElementById('register-password').value;
-    const passwordConfirm = document.getElementById('register-password-confirm')?.value;
+    const form = e.currentTarget;
+const email = form.querySelector('input[type="email"]')?.value.trim() || '';
+const passwordFields = form.querySelectorAll('input[type="password"]');
+const password = passwordFields[0]?.value || '';
+const passwordConfirm = passwordFields[1]?.value;
 
     if (!email || !password) {
         showToast('Vyplňte e-mail a heslo.');
