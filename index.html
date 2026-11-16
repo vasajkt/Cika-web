@@ -1952,14 +1952,31 @@ function toggleMobileMenu() {
             showToast('Objednávku se nepodařilo odeslat. Zkontrolujte údaje a zkuste to znovu.');
             return;
         }
+let emailError = null;
 
-        cart = [];
-        saveCartToStorage();
+try {
+    const { error } = await window.supabaseClient.functions.invoke(
+        'send-order-notifications',
+        { body: { order_id: data.order_id } }
+    );
+    emailError = error;
+} catch (error) {
+    emailError = error;
+}
 
-        showToast(
-            `Objednávka ${String(data.order_id).slice(0, 8)} přijata. Celkem ${Number(data.total).toLocaleString('cs-CZ')} Kč.`
-        );
+if (emailError) {
+    console.error('Objednávka je uložená, ale e-mail se nepodařilo odeslat:', emailError);
+}
 
+cart = [];
+saveCartToStorage();
+
+showToast(
+    emailError
+        ? `Objednávka ${String(data.order_id).slice(0, 8)} je přijata, ale e-mail se nepodařilo odeslat.`
+        : `Objednávka ${String(data.order_id).slice(0, 8)} přijata. Celkem ${Number(data.total).toLocaleString('cs-CZ')} Kč.`
+);
+      
         const { data: { user } } =
             await window.supabaseClient.auth.getUser();
 
