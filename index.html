@@ -2256,10 +2256,35 @@ statusSelect.addEventListener('change', async () => {
         statusSelect.value = previousStatus;
         return;
     }
+order.status = newStatus;
+status.textContent = `Stav: ${statusLabels[newStatus]}`;
 
-    order.status = newStatus;
-    status.textContent = `Stav: ${statusLabels[newStatus]}`;
+if (newStatus === 'paid') {
+    let emailError = null;
+    let emailData = null;
+
+    try {
+        const result = await window.supabaseClient.functions.invoke(
+            'send-payment-confirmation',
+            { body: { order_id: order.id } }
+        );
+        emailError = result.error;
+        emailData = result.data;
+    } catch (error) {
+        emailError = error;
+    }
+
+    if (emailError) {
+        console.error('Potvrzení platby se nepodařilo odeslat:', emailError);
+        showToast('Stav Zaplaceno byl uložen, ale e-mail se nepodařilo odeslat.');
+    } else if (emailData?.already_sent) {
+        showToast('Stav byl uložen; potvrzení platby už bylo odesláno.');
+    } else {
+        showToast('Platba byla označena jako zaplacená a potvrzení bylo odesláno.');
+    }
+} else {
     showToast('Stav objednávky byl uložen.');
+}
 });
         const details = document.createElement('details');
         details.className = 'mt-3 border-t border-beige-dark/40 pt-3';
