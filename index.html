@@ -782,7 +782,18 @@ console.log("ČIKA TEST — klient:", typeof window.supabaseClient.from);
                 Přihlásit se
             </button>
         </form>
+   
 
+        <button
+            type="button"
+            onclick="handleForgotPassword()"
+            class="mt-4 w-full text-sm text-cappuccino hover:underline"
+        >
+            Zapomněli jste heslo?
+        </button>
+
+        <div class="text-center mt-6">
+            <p class="text-xs text-charcoal/60">Ještě nemáte účet?</p>
         <div class="text-center mt-6">
             <p class="text-xs text-charcoal/60">Ještě nemáte účet?</p>
             <button type="button" class="mt-2 text-sm text-cappuccino hover:text-cappuccino-dark font-medium"
