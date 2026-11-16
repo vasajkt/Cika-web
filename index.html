@@ -2450,5 +2450,27 @@ statusSelect.addEventListener('change', async () => {
             }, 3000);
         }
     </script>
+<script>
+window.handleForgotPassword = async function () {
+    const email = document.getElementById('account-email')?.value.trim();
+
+    if (!email) {
+        showToast('Nejdříve zadejte svůj e-mail.');
+        return;
+    }
+
+    const { error } = await window.supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: 'https://cika-web.vasajkt.workers.dev/'
+    });
+
+    if (error) {
+        console.error('Chyba při obnově hesla:', error);
+        showToast('E-mail pro obnovu hesla se nepodařilo odeslat.');
+        return;
+    }
+
+    showToast('Poslali jsme vám e-mail s odkazem pro obnovu hesla.');
+};
+</script>
 </body>
 </html>
