@@ -1789,7 +1789,7 @@ function toggleMobileMenu() {
     document.getElementById('checkout-total').textContent =
         (productsTotal + shippingPrice + paymentPrice).toLocaleString('cs-CZ') + ' Kč';
 }
-        async function handleCheckoutSubmit(e) {
+      async function handleCheckoutSubmit(e) {
     e.preventDefault();
 
     if (!cart || cart.length === 0) {
@@ -1797,115 +1797,72 @@ function toggleMobileMenu() {
         return;
     }
 
-    const firstname = document.getElementById('checkout-firstname').value.trim();
-    const lastname = document.getElementById('checkout-lastname').value.trim();
-    const email = document.getElementById('checkout-email').value.trim();
-    const phone = document.getElementById('checkout-phone').value.trim();
-    const street = document.getElementById('checkout-street').value.trim();
-    const city = document.getElementById('checkout-city').value.trim();
-    const zip = document.getElementById('checkout-zip').value.trim();
-    const note = document.getElementById('checkout-note')?.value.trim() || '';
-
-    const shipping = document.querySelector('input[name="shipping"]:checked')?.value || '';
-    const payment = document.querySelector('input[name="payment"]:checked')?.value || '';
-
-   
-const shippingPrices = {
-    "Zásilkovna": 79,
-    "Balíkovna": 69,
-    "DPD Kurýr": 129
-};
-
-const shippingPrice = shippingPrices[shipping] ?? 0;
-const paymentPrice = payment === "Dobírka" ? 39 : 0;
-
-
-    const productsTotal = cart.reduce((sum, item) => {
-        return sum + (Number(item.price) * Number(item.qty));
-    }, 0);
-
-   const total = productsTotal + shippingPrice + paymentPrice;
-
-    const fullName = `${firstname} ${lastname}`.trim();
-    const address = `${street}`;
-
-    // 1. Vytvoření objednávky
-    
-    // 1. Zjištění přihlášeného zákazníka
-    const { data: { user }, error: userError } =
-        await window.supabaseClient.auth.getUser();
-
-    if (userError) {
-        console.error("Chyba při ověřování zákazníka:", userError);
-        showToast("Nepodařilo se ověřit účet. Zkuste to prosím znovu.");
-        return;
+    const submitButton = e.submitter;
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "Odesílám objednávku…";
     }
 
-    // 2. Vytvoření objednávky
-    const { data: order, error: orderError } = await window.supabaseClient
-        .from('orders')
-        .insert([{
-            customer_name: fullName,
-            customer_email: email,
-            customer_phone: phone,
-            shipping_address: address,
-            city: city,
-            postal_code: zip,
-            note: `${note}${shipping ? ` Doprava: ${shipping}.` : ''}${payment ? ` Platba: ${payment}.` : ''}`,
-            total: total,
-            status: 'Nová',
-            user_id: user?.id ?? null
-        }])
-        .select()
-        .single();
+    try {
+        const firstname = document.getElementById('checkout-firstname').value.trim();
+        const lastname = document.getElementById('checkout-lastname').value.trim();
+        const email = document.getElementById('checkout-email').value.trim();
+        const phone = document.getElementById('checkout-phone').value.trim();
+        const street = document.getElementById('checkout-street').value.trim();
+        const city = document.getElementById('checkout-city').value.trim();
+        const zip = document.getElementById('checkout-zip').value.trim();
+        const note = document.getElementById('checkout-note')?.value.trim() || '';
 
-    if (orderError) {
-        console.error("Chyba při vytváření objednávky:", orderError);
-        showToast("Objednávku se nepodařilo odeslat. Zkuste to prosím znovu.");
-        return;
+        const shipping =
+            document.querySelector('input[name="shipping"]:checked')?.value || '';
+        const payment =
+            document.querySelector('input[name="payment"]:checked')?.value || '';
+
+        const { data, error } = await window.supabaseClient.rpc(
+            'create_shop_order',
+            {
+                p_customer_name: `${firstname} ${lastname}`.trim(),
+                p_customer_email: email,
+                p_customer_phone: phone || null,
+                p_shipping_address: street,
+                p_city: city,
+                p_postal_code: zip,
+                p_note: note,
+                p_shipping_method: shipping,
+                p_payment_method: payment,
+                p_items: cart.map(item => ({
+                    product_id: item.id,
+                    quantity: Number(item.qty)
+                }))
+            }
+        );
+
+        if (error) {
+            console.error('Chyba při vytváření objednávky:', error);
+            showToast('Objednávku se nepodařilo odeslat. Zkontrolujte údaje a zkuste to znovu.');
+            return;
+        }
+
+        cart = [];
+        saveCartToStorage();
+
+        showToast(
+            `Objednávka ${String(data.order_id).slice(0, 8)} přijata. Celkem ${Number(data.total).toLocaleString('cs-CZ')} Kč.`
+        );
+
+        const { data: { user } } =
+            await window.supabaseClient.auth.getUser();
+
+        navigateTo(user ? 'account' : 'home');
+    } catch (error) {
+        console.error('Neočekávaná chyba při objednávce:', error);
+        showToast('Nastala chyba při odesílání objednávky. Zkuste to prosím znovu.');
+    } finally {
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = "Odeslat objednávku s povinností platby";
+        }
     }
-
-
-    if (orderError) {
-        console.error("Chyba při vytváření objednávky:", orderError);
-        showToast("Objednávku se nepodařilo odeslat. Zkuste to prosím znovu.");
-        return;
-    }
-
-    // 2. Přidání položek objednávky
-    const orderItems = cart.map(item => ({
-        order_id: order.id,
-        product_id: item.id,
-        product_name: item.title,
-        quantity: Number(item.qty),
-        unit_price: Number(item.price)
-    }));
-
-    const itemsToInsert = orderItems.map((item) => ({
-    ...item,
-    product_id:
-        typeof item.product_id === "string" &&
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.product_id)
-            ? item.product_id
-            : null
-}));
-
-const { error: itemsError } = await window.supabaseClient
-    .from('order_items')
-    .insert(itemsToInsert);
-
-if (itemsError) {
-    console.error("Chyba při ukládání položek objednávky:", itemsError);
-    showToast("Objednávka byla vytvořena, ale nepodařilo se uložit její položky.");
-    return;
-}
-
-    // 3. Vyčištění košíku
-    cart = [];
-    saveCartToStorage();
-
-    showToast("Objednávka byla úspěšně odeslána! Děkujeme.");
-    navigateTo('account');
 }
         /* ==========================================================================
            8. AUTHENTICATION & ADMIN HANDLERS
