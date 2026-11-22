@@ -1269,7 +1269,7 @@ console.log("ČIKA TEST — klient:", typeof window.supabaseClient.from);
 
     const { data, error } = await window.supabaseClient
         .from('products')
-        .select('*')
+        .select('*, product_variants(id, color, availability)')
         .eq('active', true)
         .order('created_at', { ascending: true });
 
@@ -1286,6 +1286,7 @@ console.log("ČIKA TEST — klient:", typeof window.supabaseClient.from);
         price: Number(product.price),
         stock: Number(product.stock) || 0,
         availability: Number(product.stock) > 0 ? 'Skladem' : 'Vyprodáno',
+       variants: product.product_variants || [],
         image: product.image_url,
         description: product.description
     }));
