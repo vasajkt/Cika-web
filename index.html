@@ -1948,6 +1948,7 @@ const { data, error } = await window.supabaseClient.functions.invoke(
 
         if (error) {
             console.error('Chyba při vytváření objednávky:', error);
+           window.turnstile?.reset();
             showToast('Objednávku se nepodařilo odeslat. Zkontrolujte údaje a zkuste to znovu.');
             return;
         }
