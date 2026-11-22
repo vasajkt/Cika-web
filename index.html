@@ -1102,19 +1102,20 @@ console.log("ČIKA TEST — klient:", typeof window.supabaseClient.from);
                         <option value="Andílci / dárky">Andílci / dárky</option>
                     </select>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-charcoal mb-1">Cena (Kč)</label>
-                        <input type="number" id="admin-p-price" required class="w-full px-3 py-1.5 text-xs border border-beige-dark rounded-lg bg-cream">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-charcoal mb-1">Dostupnost</label>
-                        <select id="admin-p-stock" class="w-full px-3 py-1.5 text-xs border border-beige-dark rounded-lg bg-cream">
-                            <option value="Skladem">Skladem</option>
-                            <option value="Na zakázku">Na zakázku</option>
-                        </select>
-                    </div>
-                </div>
+         <div>
+    <label class="block text-xs font-semibold text-charcoal mb-1">Cena (Kč)</label>
+    <input type="number" id="admin-p-price" required
+        class="w-full px-3 py-1.5 text-xs border border-beige-dark rounded-lg bg-cream">
+</div>
+
+<div class="space-y-2">
+    <label class="block text-xs font-semibold text-charcoal mb-1">Barvy a dostupnost</label>
+    <div id="admin-p-variants" class="space-y-2"></div>
+    <button type="button" onclick="addAdminProductVariantRow()"
+        class="px-3 py-2 border border-beige-dark text-xs rounded-lg">
+        + Přidat barvu
+    </button>
+</div>
                 <div>
                     <label class="block text-xs font-semibold text-charcoal mb-1">Obrázek (URL)</label>
                     <input type="url" id="admin-p-img" required class="w-full px-3 py-1.5 text-xs border border-beige-dark rounded-lg bg-cream">
