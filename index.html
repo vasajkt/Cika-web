@@ -1975,9 +1975,10 @@ const { data, error } = await window.supabaseClient.functions.invoke(
             p_shipping_method: shipping,
             p_payment_method: payment,
             p_items: cart.map(item => ({
-                product_id: item.id,
-                quantity: Number(item.qty)
-            }))
+    product_id: item.id,
+    variant_id: item.variantId || null,
+    quantity: Number(item.qty)
+}))
         }
     }
 );
