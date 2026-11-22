@@ -2428,7 +2428,16 @@ if (newStatus === 'paid') {
     const title = document.getElementById('admin-p-title').value.trim();
     const categoryName = document.getElementById('admin-p-category').value;
     const price = Number(document.getElementById('admin-p-price').value);
-    const availability = document.getElementById('admin-p-stock').value;
+   const variantRows = [...document.querySelectorAll('#admin-p-variants > div')];
+const variants = variantRows.map(row => ({
+    color: row.querySelector('input').value.trim(),
+    availability: row.querySelector('select').value
+}));
+
+if (variants.length === 0 || variants.some(variant => !variant.color)) {
+    showToast('Přidejte alespoň jednu barvu.');
+    return;
+}
     const imageUrl = document.getElementById('admin-p-img').value.trim();
     const description = document.getElementById('admin-p-desc').value.trim();
 
