@@ -2377,6 +2377,43 @@ if (newStatus === 'paid') {
         container.appendChild(card);
     });
 }
+       function addAdminProductVariantRow(color = '', availability = 'Skladem') {
+    const container = document.getElementById('admin-p-variants');
+    if (!container) return;
+
+    const row = document.createElement('div');
+    row.className = 'flex gap-2 items-center';
+
+    const colorInput = document.createElement('input');
+    colorInput.type = 'text';
+    colorInput.placeholder = 'Např. přírodní krémová';
+    colorInput.value = color;
+    colorInput.required = true;
+    colorInput.className =
+        'flex-1 px-3 py-2 text-xs border border-beige-dark rounded-lg bg-cream';
+
+    const availabilitySelect = document.createElement('select');
+    availabilitySelect.className =
+        'px-3 py-2 text-xs border border-beige-dark rounded-lg bg-cream';
+
+    ['Skladem', 'Vyprodáno', 'Na zakázku'].forEach(value => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = value;
+        availabilitySelect.appendChild(option);
+    });
+
+    availabilitySelect.value = availability;
+
+    const removeButton = document.createElement('button');
+    removeButton.type = 'button';
+    removeButton.textContent = 'Odebrat';
+    removeButton.className = 'text-xs text-rose';
+    removeButton.onclick = () => row.remove();
+
+    row.append(colorInput, availabilitySelect, removeButton);
+    container.appendChild(row);
+}
         function toggleAddProductModal(show) {
             const modal = document.getElementById('admin-product-modal');
             if (modal) {
