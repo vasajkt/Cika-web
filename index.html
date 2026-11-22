@@ -1730,10 +1730,11 @@ function openProductDetail(productId) {
         });
 
         const firstAvailable = variants.find(v => v.availability !== 'Vyprodáno');
-        select.value = (firstAvailable || variants[0]).id;
-    } else {
-        picker.classList.add('hidden');
-    }
+select.value = (firstAvailable || variants[0]).id;
+select.onchange = updateDetailVariantAvailability;
+} else {
+    picker.classList.add('hidden');
+}
 
     updateDetailVariantAvailability();
     navigateTo('product');
