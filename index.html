@@ -1917,24 +1917,34 @@ function toggleMobileMenu() {
         const payment =
             document.querySelector('input[name="payment"]:checked')?.value || '';
 
-        const { data, error } = await window.supabaseClient.rpc(
-            'create_shop_order',
-            {
-                p_customer_name: `${firstname} ${lastname}`.trim(),
-                p_customer_email: email,
-                p_customer_phone: phone || null,
-                p_shipping_address: street,
-                p_city: city,
-                p_postal_code: zip,
-                p_note: note,
-                p_shipping_method: shipping,
-                p_payment_method: payment,
-                p_items: cart.map(item => ({
-                    product_id: item.id,
-                    quantity: Number(item.qty)
-                }))
-            }
-        );
+        const turnstileToken = window.turnstile?.getResponse();
+
+if (!turnstileToken) {
+    showToast("Prosím dokončete ověření proti robotům.");
+    return;
+}
+
+const { data, error } = await window.supabaseClient.functions.invoke(
+    'create-verified-order',
+    {
+        body: {
+            turnstile_token: turnstileToken,
+            p_customer_name: `${firstname} ${lastname}`.trim(),
+            p_customer_email: email,
+            p_customer_phone: phone || null,
+            p_shipping_address: street,
+            p_city: city,
+            p_postal_code: zip,
+            p_note: note,
+            p_shipping_method: shipping,
+            p_payment_method: payment,
+            p_items: cart.map(item => ({
+                product_id: item.id,
+                quantity: Number(item.qty)
+            }))
+        }
+    }
+);
 
         if (error) {
             console.error('Chyba při vytváření objednávky:', error);
