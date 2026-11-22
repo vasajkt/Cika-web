@@ -2429,24 +2429,25 @@ if (newStatus === 'paid') {
             }
         }
 
-        async function handleAdminSaveProduct(e) {
+       async function handleAdminSaveProduct(e) {
     e.preventDefault();
 
     const title = document.getElementById('admin-p-title').value.trim();
     const categoryName = document.getElementById('admin-p-category').value;
     const price = Number(document.getElementById('admin-p-price').value);
-   const variantRows = [...document.querySelectorAll('#admin-p-variants > div')];
-const variants = variantRows.map(row => ({
-    color: row.querySelector('input').value.trim(),
-    availability: row.querySelector('select').value
-}));
-
-if (variants.length === 0 || variants.some(variant => !variant.color)) {
-    showToast('Přidejte alespoň jednu barvu.');
-    return;
-}
     const imageUrl = document.getElementById('admin-p-img').value.trim();
     const description = document.getElementById('admin-p-desc').value.trim();
+
+    const variantRows = [...document.querySelectorAll('#admin-p-variants > div')];
+    const variants = variantRows.map(row => ({
+        color: row.querySelector('input').value.trim(),
+        availability: row.querySelector('select').value
+    }));
+
+    if (variants.length === 0 || variants.some(variant => !variant.color)) {
+        showToast('Přidejte alespoň jednu barvu.');
+        return;
+    }
 
     const categoryResult = await window.supabaseClient
         .from('categories')
@@ -2484,46 +2485,46 @@ if (variants.length === 0 || variants.some(variant => !variant.color)) {
         ? `${baseSlug}-${Date.now()}`
         : baseSlug;
 
-    
+    const { data: savedProduct, error } = await window.supabaseClient
+        .from('products')
+        .insert({
+            category_id: categoryResult.data?.id ?? null,
+            name: title,
+            slug,
+            description,
+            price,
+            stock: variants.some(v => v.availability !== 'Vyprodáno') ? 1 : 0,
+            image_url: imageUrl,
+            active: true
+        })
+        .select('id')
+        .single();
+
+    if (error) {
+        console.error('Chyba při ukládání produktu:', error);
+        showToast('Produkt se nepodařilo uložit.');
+        return;
+    }
+
+    const { error: variantsError } = await window.supabaseClient
+        .from('product_variants')
+        .insert(variants.map(variant => ({
+            product_id: savedProduct.id,
+            color: variant.color,
+            availability: variant.availability
+        })));
+
+    if (variantsError) {
+        console.error('Chyba při ukládání barev:', variantsError);
+        showToast('Produkt se uložil, ale barvy se nepodařilo uložit.');
+        return;
+    }
+
     e.target.reset();
-           document.getElementById('admin-p-variants').innerHTML = '';
+    document.getElementById('admin-p-variants').innerHTML = '';
     toggleAddProductModal(false);
     await fetchProductsFromSupabase();
-    showToast('Produkt byl uložen do Supabase.');
-}
-const { data: savedProduct, error } = await window.supabaseClient
-    .from('products')
-    .insert({
-        category_id: categoryResult.data?.id ?? null,
-        name: title,
-        slug,
-        description,
-        price,
-        stock: variants.some(v => v.availability !== 'Vyprodáno') ? 1 : 0,
-        image_url: imageUrl,
-        active: true
-    })
-    .select('id')
-    .single();
-
-if (error) {
-    console.error('Chyba při ukládání produktu:', error);
-    showToast('Produkt se nepodařilo uložit.');
-    return;
-}
-
-const { error: variantsError } = await window.supabaseClient
-    .from('product_variants')
-    .insert(variants.map(variant => ({
-        product_id: savedProduct.id,
-        color: variant.color,
-        availability: variant.availability
-    })));
-
-if (variantsError) {
-    console.error('Chyba při ukládání barev:', variantsError);
-    showToast('Produkt se uložil, ale barvy se nepodařilo uložit.');
-    return;
+    showToast('Produkt a jeho barvy byly uloženy.');
 }
       async function toggleStockStatus(index) {
     const product = products[index];
