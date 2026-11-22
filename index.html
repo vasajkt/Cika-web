@@ -1698,46 +1698,103 @@ function toggleMobileMenu() {
         /* ==========================================================================
            5. PRODUCT DETAIL LOGIC
            ========================================================================== */
-        function openProductDetail(productId) {
-            const product = products.find(p => p.id === productId);
-            if (!product) return;
+function openProductDetail(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
 
-            activeProductDetail = product;
-            document.getElementById('product-detail-img').src = product.image;
-            document.getElementById('product-detail-title').innerText = product.title;
-            document.getElementById('product-detail-title-crumb').innerText = product.title;
-            document.getElementById('product-detail-category').innerText = product.category;
-            document.getElementById('product-detail-category-crumb').innerText = product.category;
-            document.getElementById('product-detail-price').innerText = `${product.price} Kč`;
-            document.getElementById('product-detail-desc').innerText = product.description;
-            document.getElementById('product-detail-stock').innerText = product.availability;
-            document.getElementById('product-detail-qty').value = 1;
+    activeProductDetail = product;
 
-            navigateTo('product');
+    document.getElementById('product-detail-img').src = product.image;
+    document.getElementById('product-detail-title').innerText = product.title;
+    document.getElementById('product-detail-title-crumb').innerText = product.title;
+    document.getElementById('product-detail-category').innerText = product.category;
+    document.getElementById('product-detail-category-crumb').innerText = product.category;
+    document.getElementById('product-detail-price').innerText = `${product.price} Kč`;
+    document.getElementById('product-detail-desc').innerText = product.description || '';
+    document.getElementById('product-detail-qty').value = 1;
+
+    const select = document.getElementById('product-detail-variant');
+    const picker = select?.parentElement;
+    const variants = Array.isArray(product.variants) ? product.variants : [];
+
+    if (select) {
+        select.innerHTML = '';
+
+        if (variants.length > 0) {
+            picker?.classList.remove('hidden');
+
+            variants.forEach(variant => {
+                const option = document.createElement('option');
+                option.value = variant.id;
+                option.textContent = `${variant.color} — ${variant.availability}`;
+                option.disabled = variant.availability === 'Vyprodáno';
+                select.appendChild(option);
+            });
+
+            const firstAvailable = variants.find(v => v.availability !== 'Vyprodáno');
+            select.value = (firstAvailable || variants[0]).id;
+            select.onchange = updateDetailVariantAvailability;
+        } else {
+            picker?.classList.add('hidden');
         }
+    }
 
-        function adjustDetailQty(delta) {
-            const input = document.getElementById('product-detail-qty');
-            let val = parseInt(input.value) || 1;
-            val = Math.max(1, val + delta);
-            input.value = val;
+    updateDetailVariantAvailability();
+    navigateTo('product');
+}
+
+function updateDetailVariantAvailability() {
+    if (!activeProductDetail) return;
+
+    const select = document.getElementById('product-detail-variant');
+    const variants = activeProductDetail.variants || [];
+    const selected = variants.find(v => String(v.id) === select?.value);
+    const availability = selected?.availability || activeProductDetail.availability || 'Vyprodáno';
+    const badge = document.getElementById('product-detail-stock');
+
+    if (!badge) return;
+
+    badge.textContent = availability;
+    badge.className = 'px-2.5 py-1 text-[11px] font-semibold rounded-full';
+
+    if (availability === 'Skladem') {
+        badge.classList.add('bg-sage/20', 'text-sage');
+    } else if (availability === 'Vyprodáno') {
+        badge.classList.add('bg-rose/20', 'text-cappuccino');
+    } else {
+        badge.classList.add('bg-cappuccino/20', 'text-cappuccino');
+    }
+}
+
+function addCurrentProductToCart() {
+    if (!activeProductDetail) return;
+
+    const qty = parseInt(document.getElementById('product-detail-qty').value) || 1;
+    const variants = activeProductDetail.variants || [];
+    let selectedVariant = null;
+
+    if (variants.length > 0) {
+        const select = document.getElementById('product-detail-variant');
+        selectedVariant = variants.find(v => String(v.id) === select.value);
+
+        if (!selectedVariant) {
+            showToast('Vyberte prosím barvu.');
+            return;
         }
-
-        function addCurrentProductToCart() {
-            if (!activeProductDetail) return;
-            const qty = parseInt(document.getElementById('product-detail-qty').value) || 1;
-            const variant = document.getElementById('product-detail-variant').value;
-            
-            addToCart(activeProductDetail, qty, variant);
+        if (selectedVariant.availability === 'Vyprodáno') {
+            showToast('Tato barva je vyprodaná.');
+            return;
         }
+    }
 
-        function quickAddToCart(productId) {
-            const product = products.find(p => p.id === productId);
-            if (product) {
-                addToCart(product, 1, "Přírodní krémová");
-            }
-        }
-
+    addToCart(
+        activeProductDetail,
+        qty,
+        selectedVariant
+            ? { id: selectedVariant.id, color: selectedVariant.color }
+            : null
+    );
+}
         /* ==========================================================================
            6. REACTIVE CART & LOCALSTORAGE LOGIC
            ========================================================================== */
