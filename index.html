@@ -2486,6 +2486,7 @@ if (variants.length === 0 || variants.some(variant => !variant.color)) {
 
     
     e.target.reset();
+           document.getElementById('admin-p-variants').innerHTML = '';
     toggleAddProductModal(false);
     await fetchProductsFromSupabase();
     showToast('Produkt byl uložen do Supabase.');
