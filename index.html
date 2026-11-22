@@ -1763,25 +1763,37 @@ function updateDetailVariantAvailability() {
         /* ==========================================================================
            6. REACTIVE CART & LOCALSTORAGE LOGIC
            ========================================================================== */
-        function addToCart(product, qty, variant) {
-            const existingIndex = cart.findIndex(item => item.id === product.id && item.variant === variant);
-            
-            if (existingIndex > -1) {
-                cart[existingIndex].qty += qty;
-            } else {
-                cart.push({
-                    id: product.id,
-                    title: product.title,
-                    price: product.price,
-                    image: product.image,
-                    variant: variant,
-                    qty: qty
-                });
-            }
+    function addToCart(product, qty, variant) {
+    const variantId =
+        variant && typeof variant === 'object' ? variant.id : null;
+    const variantLabel =
+        variant && typeof variant === 'object'
+            ? variant.color
+            : (variant || 'Bez varianty');
 
-            saveCartToStorage();
-            showToast(`Přidáno do košíku (${qty}x)`);
-        }
+    const existingIndex = cart.findIndex(item =>
+        item.id === product.id &&
+        (item.variantId ?? null) === variantId &&
+        item.variant === variantLabel
+    );
+
+    if (existingIndex > -1) {
+        cart[existingIndex].qty += qty;
+    } else {
+        cart.push({
+            id: product.id,
+            title: product.title,
+            price: product.price,
+            image: product.image,
+            variantId,
+            variant: variantLabel,
+            qty
+        });
+    }
+
+    saveCartToStorage();
+    showToast(`Přidáno do košíku (${qty}x)`);
+}
 
         function updateCartQty(index, delta) {
             cart[index].qty += delta;
