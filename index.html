@@ -2417,7 +2417,14 @@ if (newStatus === 'paid') {
         function toggleAddProductModal(show) {
             const modal = document.getElementById('admin-product-modal');
             if (modal) {
-                if (show) modal.classList.remove('hidden');
+               if (show) {
+    modal.classList.remove('hidden');
+
+    const variants = document.getElementById('admin-p-variants');
+    if (variants && variants.children.length === 0) {
+        addAdminProductVariantRow();
+    }
+}
                 else modal.classList.add('hidden');
             }
         }
